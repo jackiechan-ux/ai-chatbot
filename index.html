@@ -370,7 +370,7 @@
   var history = [{ role: "assistant", content: GREETING }];
 
   var starters = [
-    { chip: "see my work", icon: "down", scrollTo: '#work, [data-framer-name="playground-section"], .framer-1151lfk', q: "What work should I look at first?" },
+    { chip: "see my work", icon: "down", scrollTo: '#work, .framer-wtllop, [data-framer-name="playground-section"], .framer-1151lfk' },
     { chip: "designer archetype?", q: "What kind of designer are you?" },
     { chip: "how do you work?", q: "How do you work?" },
     { chip: "what's your availability?", q: "What is your availability?" },
@@ -504,7 +504,7 @@
     c.type = 'button';
     c.innerHTML = '<span>' + s.chip + '</span>' + (s.icon ? iconSvg(s.icon) : '');
     c.addEventListener('click', function () {
-      if (s.scrollTo && scrollToSection(s.scrollTo)) return;
+      if (s.scrollTo) { scrollToSection(s.scrollTo); return; }
       if (s.reply) { deliver(s.q, s.reply); return; }
       ask(s.q);
     });
