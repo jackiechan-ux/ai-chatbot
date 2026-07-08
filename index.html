@@ -116,14 +116,14 @@
   /* ---- headline ---- */
   .headline {
     display: flex; align-items: flex-start; gap: 16px;
-    padding: clamp(56px, 13vh, 150px) 4px 10px;
+    padding: clamp(8px, 2.5vh, 28px) 4px 10px;
   }
   .hero-avatar {
     position: relative; flex-shrink: 0;
-    width: 44px; height: 44px; border-radius: 50%;
+    width: 52px; height: 52px; border-radius: 50%;
     background: hsl(var(--accent)); color: hsl(var(--accent-foreground));
     display: grid; place-items: center;
-    font-weight: 700; font-size: 0.95rem; letter-spacing: 0.02em;
+    font-weight: 700; font-size: 1.05rem; letter-spacing: 0.02em;
     border: 1.25px solid #fff;
     box-shadow: var(--shadow-card);
     transition: width 0.5s var(--ease-out-expo), height 0.5s var(--ease-out-expo);
@@ -137,12 +137,12 @@
   .statement {
     font-family: 'Overused Grotesk', Inter, system-ui, sans-serif;
     font-weight: 500;
-    font-size: clamp(1.7rem, 4.4vw, 3.15rem);
-    line-height: 1.16; letter-spacing: -0.025em;
+    font-size: clamp(2.1rem, 5.6vw, 4rem);
+    line-height: 1.14; letter-spacing: -0.028em;
     max-width: 22ch;
     transition: font-size 0.5s var(--ease-out-expo);
   }
-  .headline.compact { padding-top: clamp(24px, 5vh, 56px); }
+  .headline.compact { padding-top: clamp(6px, 1.5vh, 16px); }
   .headline.compact .statement { font-size: clamp(1.25rem, 3vw, 1.9rem); }
   .headline.compact .hero-avatar { width: 38px; height: 38px; font-size: 0.82rem; }
 
@@ -317,9 +317,7 @@
 
     <p class="footnote">
       This assistant is AI, but the real Jackie reads every message.
-      <!-- replace with your real links -->
-      <a href="mailto:jackie.chan.ux@gmail.com">Email me</a> or connect on
-      <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>.
+      <a href="mailto:jackie.chan.ux@gmail.com">Email me</a>, I'm always responsive ;)
     </p>
   </main>
   <!-- =============== END AI CHAT HERO =============== -->
@@ -382,6 +380,20 @@
 
   function scrollDown() { log.scrollTop = log.scrollHeight; }
 
+  // Smooth-scroll to the works section. Works when the hero is inline on the page
+  // or inside a SAME-ORIGIN iframe. Returns false if the section cannot be found.
+  function scrollToSection(sel) {
+    var el = document.querySelector(sel);
+    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); return true; }
+    try {
+      if (window.top && window.top !== window.self && window.top.document) {
+        var pel = window.top.document.querySelector(sel);
+        if (pel) { pel.scrollIntoView({ behavior: 'smooth', block: 'start' }); return true; }
+      }
+    } catch (e) { /* cross-origin frame: cannot reach the parent page */ }
+    return false;
+  }
+
   function firstMessage() {
     if (started) return;
     started = true;
@@ -427,12 +439,15 @@
     if (!state) input.focus();
   }
 
+  // Your Cloudflare Worker URL (see anthropic-proxy.worker.js). Must NOT be api.anthropic.com.
+  var API_URL = "https://anthropic-proxy.jackie-chan-ux.workers.dev";
+
   async function callClaude() {
-    var res = await fetch("https://anthropic-proxy.jackie-chan-ux.workers.dev", {
+    var res = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
+        model: "claude-sonnet-5",
         max_tokens: 1000,
         system: SYSTEM,
         messages: history
@@ -483,10 +498,7 @@
     c.type = 'button';
     c.innerHTML = '<span>' + s.chip + '</span>' + (s.icon ? iconSvg(s.icon) : '');
     c.addEventListener('click', function () {
-      if (s.scrollTo) {
-        var target = document.querySelector(s.scrollTo);
-        if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
-      }
+      if (s.scrollTo && scrollToSection(s.scrollTo)) return;
       if (s.reply) { deliver(s.q, s.reply); return; }
       ask(s.q);
     });
