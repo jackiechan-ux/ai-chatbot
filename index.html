@@ -170,6 +170,7 @@
     display: flex; flex-direction: column; justify-content: flex-end;
   }
   .feed::-webkit-scrollbar { display: none; }
+  .hero:not(.chatting) .feed { min-height: clamp(20px, 5vh, 56px); }
   /* once chatting begins the feed fills the space, anchors content to the bottom,
      and fades older messages and pills up into the headline */
   .hero.chatting .feed {
@@ -317,9 +318,10 @@
     </div>
 
     <div class="feed" id="feed">
-      <div class="chips" id="chips"></div>
       <div class="log" id="log" aria-live="polite"></div>
     </div>
+
+    <div class="chips" id="chips"></div>
 
     <form class="composer" id="composer">
       <span class="prompt">&rsaquo;_</span>
@@ -407,7 +409,7 @@
 
   var starters = [
     { chip: "see my work", icon: "down", scrollTo: '#work, .framer-wtllop, [data-framer-name="playground-section"], .framer-1151lfk' },
-    { chip: "designer archetype?", q: "What kind of designer are you?", reply: "I'm a Senior Product Designer with 7+ years of experience designing products that help people make confident decisions. While I've worked across marketplaces, ecommerce, and complex platforms, the common thread is simplifying information-rich experiences into interfaces that feel fast, intuitive, and trustworthy." },
+    { chip: "designer archetype?", q: "What kind of designer are you?", reply: "I'm a Senior Product Designer with 7+ years of experience designing products that help people make confident decisions in fast-moving, high-stakes environments. While I've worked across marketplaces, ecommerce, and complex platforms, the common thread is simplifying information-rich experiences into interfaces that feel fast, intuitive, and trustworthy." },
     { chip: "leadership style?", q: "What is your leadership style?", reply: "I lead by creating clarity and empowering the people around me. As a senior individual contributor, I have led end-to-end product initiatives, partnered closely with product managers and engineers to drive alignment, and owned everything from discovery through launch and iteration. I enjoy mentoring junior designers through critiques, design reviews, and day-to-day collaboration, helping them grow while maintaining a high bar for quality. I do not think leadership requires a management title. For me, it is about taking ownership, influencing decisions with data and empathy, and creating an environment where the entire team can do their best work." },
     { chip: "how do you work?", q: "How do you work?" },
     { chip: "what have you shipped?", q: "What have you shipped and where?" },
@@ -559,5 +561,4 @@
 </script>
 </body>
 </html>
-
 
