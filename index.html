@@ -145,8 +145,8 @@
     transition: font-size 0.5s var(--ease-out-expo);
   }
   .headline.compact { padding-top: clamp(6px, 1.5vh, 16px); }
-  .headline.compact .statement { font-size: clamp(1.25rem, 3vw, 1.9rem); }
-  .headline.compact .hero-avatar { width: 38px; height: 38px; font-size: 0.82rem; }
+  .headline.compact .statement { font-size: clamp(1rem, 2.3vw, 1.3rem); line-height: 1.25; }
+  .headline.compact .hero-avatar { width: 34px; height: 34px; font-size: 0.78rem; }
 
   /* Figma-style selection marquee around the name */
   .select { position: relative; display: inline-block; padding: 0 6px; }
@@ -175,8 +175,8 @@
      and fades older messages and pills up into the headline */
   .hero.chatting .feed {
     flex: 1 1 0;
-    -webkit-mask-image: linear-gradient(transparent 0, #000 64px, #000 100%);
-    mask-image: linear-gradient(transparent 0, #000 64px, #000 100%);
+    -webkit-mask-image: linear-gradient(transparent 0, #000 36px, #000 100%);
+    mask-image: linear-gradient(transparent 0, #000 36px, #000 100%);
   }
 
   .log {
@@ -184,7 +184,7 @@
     padding: 4px 4px 0;
   }
 
-  .row { display: flex; align-items: flex-start; gap: 9px; }
+  .row { display: flex; align-items: flex-start; gap: 9px; scroll-margin-top: 10px; }
   .row.me { justify-content: flex-end; }
 
   .avatar {
@@ -424,6 +424,18 @@
 
   function scrollDown() { if (feed) feed.scrollTop = feed.scrollHeight; }
 
+  // After a reply lands: if it overflows the feed, bring the START of the latest
+  // exchange into view so the whole answer is readable. Otherwise anchor to bottom.
+  function settleScroll() {
+    if (!feed) return;
+    if (feed.scrollHeight > feed.clientHeight + 4) {
+      var rows = log.querySelectorAll('.row.me');
+      var last = rows[rows.length - 1];
+      if (last) { last.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' }); return; }
+    }
+    scrollDown();
+  }
+
   // Smooth-scroll to the works section. Works when the hero is inline on the page
   // or inside a SAME-ORIGIN iframe. Returns false if the section cannot be found.
   function scrollToSection(sel) {
@@ -513,8 +525,8 @@
     var delay = reduce ? 250 : 600;
     setTimeout(function () {
       bubble.innerHTML = html;
-      scrollDown();
       history.push({ role: "assistant", content: bubble.textContent });
+      settleScroll();
       setBusy(false);
     }, delay);
   }
@@ -530,7 +542,7 @@
       var answer = await callClaude();
       if (!answer) throw new Error("empty");
       history.push({ role: "assistant", content: answer });
-      reveal(bubble, answer, function () { setBusy(false); });
+      reveal(bubble, answer, function () { settleScroll(); setBusy(false); });
     } catch (err) {
       var msg = "Sorry, I could not reach the assistant just now. The fastest way to get me is to email jackie.chan.ux@gmail.com, and I will reply.";
       reveal(bubble, msg, function () { setBusy(false); });
