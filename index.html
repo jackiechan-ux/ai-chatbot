@@ -226,9 +226,12 @@
   .composer {
     display: flex; align-items: center; gap: 10px; background: hsl(var(--card));
     border: 1px solid hsl(var(--border)); border-radius: 16px; padding: 11px 12px 11px 16px; box-shadow: var(--shadow-card);
+    transition: border-color 0.2s ease;
   }
+  .composer:focus-within { border-color: hsl(var(--foreground) / 0.35); }
   .composer .prompt { font-family: 'Space Mono', monospace; font-size: 0.85rem; color: hsl(var(--muted-foreground)); user-select: none; }
   .composer input { flex: 1; border: 0; background: transparent; color: hsl(var(--foreground)); font-family: inherit; font-size: 1rem; outline: none; }
+  .composer input:focus, .composer input:focus-visible { outline: none; box-shadow: none; }
   .composer input::placeholder { color: hsl(var(--muted-foreground)); opacity: 0.75; }
   .send {
     flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; border: 0;
@@ -427,13 +430,18 @@
   function scrollDown() { if (feed) feed.scrollTop = feed.scrollHeight; }
 
   // After a reply lands: if it overflows the feed, bring the START of the latest
-  // exchange into view so the whole answer is readable. Otherwise anchor to bottom.
+  // exchange to the top of the feed so the whole answer is readable. This scrolls
+  // ONLY the feed (never the page), so the user stays within the hero.
   function settleScroll() {
     if (!feed) return;
     if (feed.scrollHeight > feed.clientHeight + 4) {
       var rows = log.querySelectorAll('.row.me');
       var last = rows[rows.length - 1];
-      if (last) { last.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' }); return; }
+      if (last) {
+        var target = last.offsetTop - feed.offsetTop - 8; // position within the feed's scroll content
+        feed.scrollTop = Math.max(0, target);
+        return;
+      }
     }
     scrollDown();
   }
