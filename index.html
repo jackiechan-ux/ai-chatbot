@@ -85,7 +85,9 @@
   .hero {
     position: relative;
     z-index: 1;
-    min-height: 100svh;
+    height: 100svh;
+    max-height: 100svh;
+    overflow: hidden;
     max-width: 820px;
     margin: 0 auto;
     padding: clamp(16px, 3vw, 28px);
@@ -160,17 +162,26 @@
   .select .name { position: relative; }
   .ee { font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: 0; }
 
-  /* ---- chat log ---- */
-  .log {
-    flex: 0 1 auto; min-height: 0; max-height: 44vh; overflow-y: auto;
+  /* ---- conversation feed: scrolls upward under the headline ---- */
+  .feed {
+    flex: 0 1 auto; min-height: 0;
+    overflow-y: auto; scroll-behavior: smooth;
     scrollbar-width: none; -ms-overflow-style: none;
     display: flex; flex-direction: column; justify-content: flex-end;
-    gap: 12px; padding: 4px 4px 0;
-    -webkit-mask-image: linear-gradient(transparent 0, #000 48px, #000 100%);
-    mask-image: linear-gradient(transparent 0, #000 48px, #000 100%);
   }
-  .log:empty { padding: 0; min-height: clamp(24px, 6vh, 64px); }
-  .log::-webkit-scrollbar { display: none; }
+  .feed::-webkit-scrollbar { display: none; }
+  /* once chatting begins the feed fills the space, anchors content to the bottom,
+     and fades older messages and pills up into the headline */
+  .hero.chatting .feed {
+    flex: 1 1 0;
+    -webkit-mask-image: linear-gradient(transparent 0, #000 64px, #000 100%);
+    mask-image: linear-gradient(transparent 0, #000 64px, #000 100%);
+  }
+
+  .log {
+    display: flex; flex-direction: column; gap: 12px;
+    padding: 4px 4px 0;
+  }
 
   .row { display: flex; align-items: flex-start; gap: 9px; }
   .row.me { justify-content: flex-end; }
@@ -269,6 +280,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .aurora .g { animation: none !important; }
+    .feed { scroll-behavior: auto; }
   }
 </style>
 </head>
@@ -304,9 +316,10 @@
       </h1>
     </div>
 
-    <div class="log" id="log" aria-live="polite"></div>
-
-    <div class="chips" id="chips"></div>
+    <div class="feed" id="feed">
+      <div class="chips" id="chips"></div>
+      <div class="log" id="log" aria-live="polite"></div>
+    </div>
 
     <form class="composer" id="composer">
       <span class="prompt">&rsaquo;_</span>
@@ -333,6 +346,8 @@
   var input = document.getElementById('input');
   var sendBtn = document.getElementById('send');
   var headline = document.getElementById('headline');
+  var feed = document.getElementById('feed');
+  var hero = document.querySelector('.hero');
   var busy = false;
   var started = false;
   var _hp = document.querySelector('.hero-avatar img');
@@ -392,7 +407,7 @@
 
   var starters = [
     { chip: "see my work", icon: "down", scrollTo: '#work, .framer-wtllop, [data-framer-name="playground-section"], .framer-1151lfk' },
-    { chip: "designer archetype?", q: "What kind of designer are you?", reply: "I'm a Senior Product Designer with 7+ years of experience designing products that help people make confident decisions. While I've worked across marketplaces, ecommerce, and complex platforms, the common thread is simplifying information-rich experiences into interfaces that feel fast, intuitive, and trustworthy. I enjoy designing products where data, personalization, and experimentation come together to improve the customer experience, whether that's helping someone discover the right option, complete a purchase with confidence, or engage with a product over time. I love partnering with Product, Engineering, and Data to test ideas, learn quickly, and build experiences that drive both customer satisfaction and business growth." },
+    { chip: "designer archetype?", q: "What kind of designer are you?", reply: "I'm a Senior Product Designer with 7+ years of experience designing products that help people make confident decisions. While I've worked across marketplaces, ecommerce, and complex platforms, the common thread is simplifying information-rich experiences into interfaces that feel fast, intuitive, and trustworthy." },
     { chip: "leadership style?", q: "What is your leadership style?", reply: "I lead by creating clarity and empowering the people around me. As a senior individual contributor, I have led end-to-end product initiatives, partnered closely with product managers and engineers to drive alignment, and owned everything from discovery through launch and iteration. I enjoy mentoring junior designers through critiques, design reviews, and day-to-day collaboration, helping them grow while maintaining a high bar for quality. I do not think leadership requires a management title. For me, it is about taking ownership, influencing decisions with data and empathy, and creating an environment where the entire team can do their best work." },
     { chip: "how do you work?", q: "How do you work?" },
     { chip: "what have you shipped?", q: "What have you shipped and where?" },
@@ -405,7 +420,7 @@
     return '';
   }
 
-  function scrollDown() { log.scrollTop = log.scrollHeight; }
+  function scrollDown() { if (feed) feed.scrollTop = feed.scrollHeight; }
 
   // Smooth-scroll to the works section. Works when the hero is inline on the page
   // or inside a SAME-ORIGIN iframe. Returns false if the section cannot be found.
@@ -425,6 +440,7 @@
     if (started) return;
     started = true;
     headline.classList.add('compact');
+    hero.classList.add('chatting');
   }
 
   function addUser(text) {
@@ -543,4 +559,5 @@
 </script>
 </body>
 </html>
+
 
