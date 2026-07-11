@@ -166,13 +166,14 @@
   .feed {
     flex: 0 1 auto; min-height: 0;
     overflow-y: auto; scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
     scrollbar-width: none; -ms-overflow-style: none;
-    display: flex; flex-direction: column; justify-content: flex-end;
+    display: flex; flex-direction: column;
   }
   .feed::-webkit-scrollbar { display: none; }
   .hero:not(.chatting) .feed { min-height: clamp(20px, 5vh, 56px); }
   /* once chatting begins the feed fills the space, anchors content to the bottom,
-     and fades older messages and pills up into the headline */
+     and fades older messages up into the headline (still fully scrollable up) */
   .hero.chatting .feed {
     flex: 1 1 0;
     -webkit-mask-image: linear-gradient(transparent 0, #000 36px, #000 100%);
@@ -182,6 +183,7 @@
   .log {
     display: flex; flex-direction: column; gap: 12px;
     padding: 4px 4px 0;
+    margin-top: auto; /* pins content to the bottom without clipping the top when it overflows */
   }
 
   .row { display: flex; align-items: flex-start; gap: 9px; scroll-margin-top: 10px; }
@@ -573,4 +575,5 @@
 </script>
 </body>
 </html>
+
 
