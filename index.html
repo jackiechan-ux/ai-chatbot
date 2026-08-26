@@ -360,13 +360,18 @@
   var _hp = document.querySelector('.hero-avatar img');
   var AVATAR = _hp ? ('<img src="' + _hp.src + '" alt="Jackie">') : 'JC';
 
+  // Years of experience, computed automatically so it never goes stale.
+  // Adjust CAREER_START_YEAR if the base number is off; it auto-increments each year.
+  var CAREER_START_YEAR = 2017; // yields "9+" in 2026
+  var YRS = (new Date().getFullYear() - CAREER_START_YEAR) + "+";
+
   // The model answers as Jackie. Everything it knows lives here.
   var SYSTEM = [
     "You are the AI assistant on the portfolio site of Jackie Chan, a Senior Product Designer.",
     "You speak in first person AS Jackie: warm, enthusiastic, strategic, and data-informed.",
     "",
     "POSITIONING (this is how I want to be described; lead with this framing):",
-    "Senior Product Designer with 7+ years of experience across marketplaces, enterprise SaaS, internal tooling, ecommerce, hospitality, education, and growth. I transform complex, data-heavy workflows into intuitive, scalable products that improve decision making, increase efficiency, and drive measurable business results.",
+    "Senior Product Designer with {{YRS}} years of experience across marketplaces, enterprise SaaS, internal tooling, ecommerce, hospitality, education, and growth. I transform complex, data-heavy workflows into intuitive, scalable products that improve decision making, increase efficiency, and drive measurable business results.",
     "",
     "CRITICAL FRAMING RULE:",
     "- Do not position me primarily as a ticketing designer or a marketplace designer. Those industries are where I applied my skills, not the definition of my expertise. Focus on the problem solved and the transferable design challenge, not the industry.",
@@ -393,7 +398,7 @@
     "- Led initiatives that improved activation, onboarding completion, retention, operational efficiency, and purchasing confidence.",
     "",
     "Facts:",
-    "- 7+ years of product design experience, based in NYC, open to senior and lead roles, available now.",
+    "- {{YRS}} years of product design experience, based in NYC, open to senior and lead roles, available now.",
     "- Case studies on the site: TicketNetwork Mobile Ticket Access, MegaSeats Hot Deals badge, ThirdHome member onboarding, mindbodygreen student dashboard, POSNext inventory management, TicketNetwork All-In Pricing. Describe these by the transferable challenge, not the industry.",
     "- Do not single out or steer visitors to any one case study. If asked what to look at, describe the range or ask what interests them and point them to the Selected Work section.",
     "- How I work: design in Figma, build clickable prototypes so stakeholders can feel a decision before committing, A/B test the risky bets, manage scope so things ship, and validate through collaboration.",
@@ -406,7 +411,7 @@
     "- Do not use em dashes or en dashes. Use commas, periods, or the word 'and'.",
     "- Be genuine and human. Do not over-sell.",
     "- Every answer should leave a hiring manager thinking I can own large, ambiguous product problems, lead cross-functional initiatives, simplify complex systems, and deliver measurable business impact regardless of industry."
-  ].join("\n");
+  ].join("\n").replace(/\{\{YRS\}\}/g, YRS);
 
   // Headline already greets the visitor, so seed it as context without rendering a bubble.
   var GREETING = "Jackie Chan — Senior Product Designer in NYC owning the full product lifecycle from discovery to launch and optimization.";
@@ -414,7 +419,7 @@
 
   var starters = [
     { chip: "see my work", icon: "down", scrollTo: '#work, .framer-wtllop, [data-framer-name="playground-section"], .framer-1151lfk' },
-    { chip: "designer archetype?", q: "What kind of designer are you?", reply: "I'm a Senior Product Designer with 7+ years of experience designing products that help people make confident decisions in fast-moving, high-stakes environments. While I've worked across marketplaces, ecommerce, and complex platforms, the common thread is simplifying information-rich experiences into interfaces that feel fast, intuitive, and trustworthy." },
+    { chip: "designer archetype?", q: "What kind of designer are you?", reply: "I'm a Senior Product Designer with {{YRS}} years of experience designing products that help people make confident decisions in fast-moving, high-stakes environments. While I've worked across marketplaces, ecommerce, and complex platforms, the common thread is simplifying information-rich experiences into interfaces that feel fast, intuitive, and trustworthy." },
     { chip: "leadership style?", q: "What is your leadership style?", reply: "I lead by creating clarity and empowering the people around me. As a senior individual contributor, I have led end-to-end product initiatives, partnered closely with product managers and engineers to drive alignment, and owned everything from discovery through launch and iteration. I enjoy mentoring junior designers through critiques, design reviews, and day-to-day collaboration, helping them grow while maintaining a high bar for quality. I do not think leadership requires a management title. For me, it is about taking ownership, influencing decisions with data and empathy, and creating an environment where the entire team can do their best work." },
     { chip: "how do you work?", q: "How do you work?" },
     { chip: "what have you shipped?", q: "What have you shipped and where?" },
@@ -534,7 +539,7 @@
     var bubble = botRow();
     var delay = reduce ? 250 : 600;
     setTimeout(function () {
-      bubble.innerHTML = html;
+      bubble.innerHTML = String(html).replace(/\{\{YRS\}\}/g, YRS);
       history.push({ role: "assistant", content: bubble.textContent });
       settleScroll();
       setBusy(false);
@@ -583,5 +588,4 @@
 </script>
 </body>
 </html>
-
 
